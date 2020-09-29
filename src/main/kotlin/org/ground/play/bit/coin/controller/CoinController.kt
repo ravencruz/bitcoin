@@ -1,7 +1,8 @@
 package org.ground.play.bit.coin.controller
 
-import com.fasterxml.jackson.databind.ObjectMapper
-import org.ground.play.bit.coin.dto.Greeting
+import com.fasterxml.jackson.module.kotlin.jacksonObjectMapper
+import com.fasterxml.jackson.module.kotlin.readValue
+import org.ground.play.bit.coin.dto.Bitcoin
 import org.springframework.http.HttpMethod
 import org.springframework.web.bind.annotation.GetMapping
 import org.springframework.web.bind.annotation.RestController
@@ -14,7 +15,7 @@ import org.springframework.web.reactive.function.client.awaitExchange
 class CoinController {
 
     @GetMapping("/coin")
-    suspend fun coin() : Greeting {
+    suspend fun coin() : Bitcoin {
         val webClient = WebClient
                 .builder()
                 .baseUrl("https://cex.io")
@@ -22,19 +23,16 @@ class CoinController {
 
         val bitcoinApiResonse = suspendedExchange(webClient)
 
-        val mapper = ObjectMapper()
-        mapper.readTree(bitcoinApiResonse)
+        val mapper = jacksonObjectMapper()
+        val bitcoinSample: Bitcoin = mapper.readValue(bitcoinApiResonse)
+        println("Bitcoin: $bitcoinSample")
 
-        return Greeting(1, bitcoinApiResonse.toString())
+        return bitcoinSample
     }
 
     private suspend fun suspendedExchange(client: WebClient): String {
-        val getMethod = client
-                .method(HttpMethod.GET)
-                .uri("/api/last_price/BTC/USD")
-
+        val getMethod = client.method(HttpMethod.GET).uri("/api/last_price/BTC/USD")
         val response = getMethod.awaitExchange().awaitBody<String>()
-
         return response
     }
 
