@@ -8,4 +8,5 @@ data class BitcoinPrice (
         var lprice: String,
         var curr1: String,
         var curr2: String,
-        var createdDate: LocalDateTime = LocalDateTime.now())
+        var createdDate: LocalDateTime = LocalDateTime.now()
+)
