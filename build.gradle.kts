@@ -21,12 +21,18 @@ repositories {
 dependencies {
 //	implementation("org.springframework.boot:spring-boot-starter-data-jpa")
 //	implementation("org.springframework.boot:spring-boot-starter-data-mongodb-reactive")
+	implementation("org.springframework.boot:spring-boot-starter-data-mongodb")
 //	implementation("org.springframework.boot:spring-boot-starter-web")
 	implementation("org.springframework.boot:spring-boot-starter-webflux")
+
+//	implementation ("org.springframework.boot:spring-boot-starter-data-rest:2.3.4.RELEASE")
+
 	implementation("io.projectreactor.kotlin:reactor-kotlin-extensions")
 
 //	implementation ("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.3.9")
 	implementation ("org.jetbrains.kotlinx:kotlinx-coroutines-reactor:1.3.9")
+
+
 
 	implementation("com.fasterxml.jackson.module:jackson-module-kotlin")
 	implementation("org.jetbrains.kotlin:kotlin-reflect")
