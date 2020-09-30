@@ -1,4 +1,4 @@
-package org.ground.play.bit.coin.repository
+package org.ground.play.bit.coin.dao
 
 import org.ground.play.bit.coin.dto.Bitcoin
 import org.springframework.data.mongodb.repository.MongoRepository

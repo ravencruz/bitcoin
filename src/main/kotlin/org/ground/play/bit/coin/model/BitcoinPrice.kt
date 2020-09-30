@@ -1,4 +1,4 @@
-package org.ground.play.bit.coin.repository
+package org.ground.play.bit.coin.model
 
 import org.springframework.data.mongodb.core.mapping.Document
 import java.time.LocalDateTime
