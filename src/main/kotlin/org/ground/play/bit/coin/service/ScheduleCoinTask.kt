@@ -14,7 +14,7 @@ class ScheduleCoinTask {
     @Autowired
     lateinit var service: CoinService
 
-    @Scheduled(fixedRate = 10_000)
+    @Scheduled(fixedRate = 10_000) //, initialDelay = 30_000
     fun reportTime() {
         println("The time is now ${DateTimeFormatter.ISO_LOCAL_TIME.format(LocalDateTime.now())}")
 

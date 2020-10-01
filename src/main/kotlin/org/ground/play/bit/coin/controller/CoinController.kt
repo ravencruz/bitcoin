@@ -40,6 +40,4 @@ class CoinController {
         val res = ResponseEntity.ok(coins)
         return res
     }
-
-
 }
