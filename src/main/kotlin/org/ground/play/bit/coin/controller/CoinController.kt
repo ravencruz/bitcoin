@@ -2,6 +2,7 @@ package org.ground.play.bit.coin.controller
 
 
 import org.ground.play.bit.coin.dto.Bitcoin
+import org.ground.play.bit.coin.dto.BitcoinInformation
 import org.ground.play.bit.coin.service.CoinService
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.http.ResponseEntity
@@ -16,19 +17,6 @@ class CoinController {
     @Autowired
     lateinit var service: CoinService
 
-    @GetMapping("/coin/price/current")
-    suspend fun currentPrice() : ResponseEntity<Bitcoin> {
-        val bitCoinPrice = service.currentPrice()
-        val response = ResponseEntity.ok(bitCoinPrice)
-        return response
-    }
-
-    @GetMapping("/coin/price")
-    suspend fun saveSearch(@RequestParam time: String) : Bitcoin {
-        println("time $time")
-        return service.saveAndFind(time)
-    }
-
     @GetMapping("/coin/find")
     suspend fun findBitcoin(@RequestParam time: String) : ResponseEntity<Bitcoin> {
         println("time $time")
@@ -38,8 +26,25 @@ class CoinController {
     }
 
     @GetMapping("/coin/find/average")
-    suspend fun priceAverage(@RequestParam time1: String, @RequestParam time2: String) : Bitcoin {
-
-        return service.findAveragePrice(time1, time2)
+    suspend fun priceAverage(@RequestParam timeStart: String, @RequestParam timeEnd: String): ResponseEntity<BitcoinInformation> {
+        println("timeStart $timeStart timeEnd $timeEnd")
+        val info =  service.findAveragePrice(timeStart, timeEnd)
+        val res = ResponseEntity.ok(info)
+        return res
     }
+
+//    @GetMapping("/coin/price/current")
+//    suspend fun currentPrice() : ResponseEntity<Bitcoin> {
+//        val bitCoinPrice = service.currentPrice()
+//        val response = ResponseEntity.ok(bitCoinPrice)
+//        return response
+//    }
+
+//    @GetMapping("/coin/price")
+//    suspend fun saveSearch(@RequestParam time: String) : Bitcoin {
+//        println("time $time")
+//        return service.saveAndFind(time)
+//    }
+
+
 }
