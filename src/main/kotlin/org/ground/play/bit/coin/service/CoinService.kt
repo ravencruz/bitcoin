@@ -2,11 +2,12 @@ package org.ground.play.bit.coin.service
 
 import com.fasterxml.jackson.module.kotlin.jacksonObjectMapper
 import com.fasterxml.jackson.module.kotlin.readValue
-import org.ground.play.bit.coin.dao.BitcoinDocumentPriceRepository
+import org.ground.play.bit.coin.dao.BitcoinPriceRepository
 import org.ground.play.bit.coin.dto.Bitcoin
 import org.ground.play.bit.coin.dto.BitcoinInformation
-import org.ground.play.bit.coin.model.BitcoinDocumentPrice
+import org.ground.play.bit.coin.model.BitcoinPriceDocument
 import org.springframework.beans.factory.annotation.Autowired
+import org.springframework.data.domain.Sort
 import org.springframework.http.HttpMethod
 import org.springframework.stereotype.Service
 import org.springframework.web.reactive.function.client.WebClient
@@ -20,7 +21,7 @@ import java.time.format.DateTimeFormatter
 class CoinService {
 
     @Autowired
-    lateinit var bitcoinDocumentRepository: BitcoinDocumentPriceRepository
+    lateinit var bitcoinRepository: BitcoinPriceRepository
 
     val mapper = jacksonObjectMapper()
 
@@ -34,10 +35,10 @@ class CoinService {
         println("Bitcoin response: $bitcoinResponse")
 
         try {
-            val bitcoinPrice = BitcoinDocumentPrice(bitcoinResponse.lprice.toDouble(),
+            val bitcoinPrice = BitcoinPriceDocument(bitcoinResponse.lprice.toDouble(),
                     bitcoinResponse.curr1,
                     bitcoinResponse.curr2)
-            val savedEntity = bitcoinDocumentRepository.save(bitcoinPrice)
+            val savedEntity = bitcoinRepository.save(bitcoinPrice)
             println("Bitcoin entity saved: $savedEntity")
         } catch (e: Exception) {
             println("Error while saving bitcoin ${e.message}")
@@ -48,10 +49,10 @@ class CoinService {
 
     suspend fun findPrice(time: String): Bitcoin {
         val dummyBitcoin = Bitcoin("0", "0", "0")
-        println("Bitcoin: $dummyBitcoin")
+        println("dummyBitcoin: $dummyBitcoin")
 
         val localDate = LocalDateTime.parse(time, DateTimeFormatter.ISO_LOCAL_DATE_TIME)
-        val findByCreatedDate = bitcoinDocumentRepository.findByCreatedDate(localDate)
+        val findByCreatedDate = bitcoinRepository.findByCreatedDate(localDate)
         println("found: $findByCreatedDate")
 
         val res = if (findByCreatedDate.isEmpty()) {
@@ -96,23 +97,32 @@ class CoinService {
 
     suspend fun findAveragePrice(startTime: String, endTime: String): BitcoinInformation {
         val dummyBitcoin = BitcoinInformation(0.0, 0.0)
-        println("Bitcoin: $dummyBitcoin")
-
         val localStartDate = LocalDateTime.parse(startTime, DateTimeFormatter.ISO_LOCAL_DATE_TIME)
         val localEndDate = LocalDateTime.parse(endTime, DateTimeFormatter.ISO_LOCAL_DATE_TIME)
 
-        val findByCreatedDate = bitcoinDocumentRepository.findByCreatedDateBetween(localStartDate, localEndDate)
+        val findByCreatedDate = bitcoinRepository.findByCreatedDateBetween(localStartDate, localEndDate)
         println("found range template: $findByCreatedDate")
 
-        val findRangeByQuery = bitcoinDocumentRepository.findMe(localStartDate, localEndDate)
-        println("found range me: $findRangeByQuery")
-        println("found range me: ${findRangeByQuery.size}")
+        val bitcoinInRange = bitcoinRepository.findMe(localStartDate, localEndDate)
+        println("found range me: $bitcoinInRange")
+        println("found range me: ${bitcoinInRange.size}")
+
+        //val sorting = Sort(Sort.Direction.DESC, "lprice")
+//        bitcoinDocumentRepository.findAll(sorting)
+        val allCoins = bitcoinRepository.findAll(Sort.by(Sort.Direction.DESC, "lprice"))
+        println("size coinds ${allCoins.size}")
+        println(" first coin ${allCoins[0]}")
+        val maxPrice = allCoins[0].lprice
 
 //        val maxPrice = bitcoinRepository.findTopOrderByLpriceDesc()
 //        println("found max: $maxPrice")
 
-        val average = findRangeByQuery.map { it.lprice.toDouble() }.average()
-        dummyBitcoin.average = average
+        val averagePrice = bitcoinInRange.map { it.lprice }.average()
+        val diferenciaPorcentual =  Math.abs( maxPrice - averagePrice ) / averagePrice * 100
+
+        dummyBitcoin.average = averagePrice
+        dummyBitcoin.differenceAverageMax = diferenciaPorcentual
+        println("Bitcoin: $dummyBitcoin")
 
         return dummyBitcoin
     }
