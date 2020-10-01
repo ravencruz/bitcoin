@@ -23,6 +23,9 @@ class CoinService {
     @Autowired
     lateinit var bitcoinRepository: BitcoinPriceRepository
 
+    @Autowired
+    lateinit var calculator: Calculator
+
     val mapper = jacksonObjectMapper()
 
     val webClient = WebClient
@@ -48,7 +51,7 @@ class CoinService {
     }
 
     suspend fun findPrice(time: String): Bitcoin {
-        val dummyBitcoin = Bitcoin("0", "0", "0", LocalDateTime.now())
+        val dummyBitcoin = Bitcoin("0", "0", "0")
         println("dummyBitcoin: $dummyBitcoin")
 
         val localDate = LocalDateTime.parse(time, DateTimeFormatter.ISO_LOCAL_DATE_TIME)
@@ -66,7 +69,7 @@ class CoinService {
     }
 
     suspend fun findAll(): List<Bitcoin> {
-        val dummyBitcoin = Bitcoin("0", "0", "0", LocalDateTime.now())
+        val dummyBitcoin = Bitcoin("0", "0", "0")
         println("dummyBitcoin: $dummyBitcoin")
 
         val allCoins = bitcoinRepository.findAll(Sort.by(Sort.Direction.DESC, "lprice"))
@@ -76,39 +79,24 @@ class CoinService {
     }
 
     suspend fun findAveragePrice(startTime: String, endTime: String): BitcoinInformation {
-        val dummyBitcoin = BitcoinInformation(0.0, 0.0)
         val localStartDate = LocalDateTime.parse(startTime, DateTimeFormatter.ISO_LOCAL_DATE_TIME)
         val localEndDate = LocalDateTime.parse(endTime, DateTimeFormatter.ISO_LOCAL_DATE_TIME)
 
-        val findByCreatedDate = bitcoinRepository.findByCreatedDateBetween(localStartDate, localEndDate)
-        println("found range template: $findByCreatedDate")
+//        val findByCreatedDate = bitcoinRepository.findByCreatedDateBetween(localStartDate, localEndDate)
+//        println("found range template: $findByCreatedDate")
+//        println("found range template: ${findByCreatedDate.size}")
 
-        val bitcoinInRange = bitcoinRepository.findMe(localStartDate, localEndDate)
-        println("found range me: $bitcoinInRange")
-        println("found range me: ${bitcoinInRange.size}")
-
-        //val sorting = Sort(Sort.Direction.DESC, "lprice")
-//        bitcoinDocumentRepository.findAll(sorting)
+        val bitcoinInRange = bitcoinRepository.findBitcoinBetweenIncluded(localStartDate, localEndDate)
         val allCoins = bitcoinRepository.findAll(Sort.by(Sort.Direction.DESC, "lprice"))
-        println("size coinds ${allCoins.size}")
-        println(" first coin ${allCoins[0]}")
-        val maxPrice = allCoins[0].lprice
+        val dataBitcoin = calculator.porcentualDifference(bitcoinInRange, allCoins)
+        println("Bitcoin Information: $dataBitcoin")
 
-//        val maxPrice = bitcoinRepository.findTopOrderByLpriceDesc()
-//        println("found max: $maxPrice")
-
-        val averagePrice = bitcoinInRange.map { it.lprice }.average()
-        val diferenciaPorcentual =  Math.abs( maxPrice - averagePrice ) / averagePrice * 100
-
-        dummyBitcoin.average = averagePrice
-        dummyBitcoin.differenceAverageMax = diferenciaPorcentual
-        println("Bitcoin: $dummyBitcoin")
-
-        return dummyBitcoin
+        return dataBitcoin
     }
 
     private suspend fun getPojoFromRequest(): Bitcoin {
         val bitcoinApiResponse = callApi()
+        println("api response: $bitcoinApiResponse")
         val bitcoinResponse: Bitcoin = mapper.readValue(bitcoinApiResponse)
         return bitcoinResponse
     }

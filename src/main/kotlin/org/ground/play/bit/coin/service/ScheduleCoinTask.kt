@@ -20,7 +20,12 @@ class ScheduleCoinTask {
 
         runBlocking {
             launch {
-                service.saveBitcoinPrice()
+                try {
+                    service.saveBitcoinPrice()
+                } catch (e: Exception) {
+                    println("Error al guardar ${e.message}")
+                }
+
             }
         }
     }
