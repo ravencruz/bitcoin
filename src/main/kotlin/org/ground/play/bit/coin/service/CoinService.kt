@@ -42,6 +42,24 @@ class CoinService {
         return Bitcoin(bitcoinResponse.lprice, bitcoinResponse.curr1, bitcoinResponse.curr2)
     }
 
+    suspend fun findPrice(time: String): Bitcoin {
+        val dummyBitcoin = Bitcoin("0", "0", "0")
+        println("Bitcoin: $dummyBitcoin")
+
+        val localDate = LocalDateTime.parse(time, DateTimeFormatter.ISO_LOCAL_DATE_TIME)
+        val findByCreatedDate = bitcoinRepository.findByCreatedDate(localDate)
+        println("found: $findByCreatedDate")
+
+        val res = if (findByCreatedDate.isEmpty()) {
+            dummyBitcoin
+        } else {
+            val first = findByCreatedDate.get(0)
+            Bitcoin(first.lprice, first.curr1, first.curr2)
+        }
+
+        return res
+    }
+
     //TODO should return the DAO or a representation?
     suspend fun currentPrice(): Bitcoin {
         val bitcoinResponse = getPojoFromRequest()
@@ -70,19 +88,6 @@ class CoinService {
         println("found: $findByCreatedDate")
 
         return Bitcoin(dummyBitcoin.lprice, dummyBitcoin.curr1, dummyBitcoin.curr2)
-    }
-
-    suspend fun findPrice(time: String): BitcoinPrice {
-        val dummyBitcoin = BitcoinPrice("0", "0", "0",  LocalDateTime.now())
-        println("Bitcoin: $dummyBitcoin")
-
-
-        val localDate = LocalDateTime.parse(time, DateTimeFormatter.ISO_LOCAL_DATE_TIME)
-
-        val findByCreatedDate = bitcoinRepository.findByCreatedDate(localDate)
-        println("found: $findByCreatedDate")
-
-        return findByCreatedDate.get(0)
     }
 
     suspend fun findAveragePrice(startTime: String, endTime: String): Bitcoin {

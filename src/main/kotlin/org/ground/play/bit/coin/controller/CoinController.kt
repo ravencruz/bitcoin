@@ -2,9 +2,9 @@ package org.ground.play.bit.coin.controller
 
 
 import org.ground.play.bit.coin.dto.Bitcoin
-import org.ground.play.bit.coin.model.BitcoinPrice
 import org.ground.play.bit.coin.service.CoinService
 import org.springframework.beans.factory.annotation.Autowired
+import org.springframework.http.ResponseEntity
 import org.springframework.web.bind.annotation.GetMapping
 import org.springframework.web.bind.annotation.RequestParam
 import org.springframework.web.bind.annotation.RestController
@@ -17,8 +17,10 @@ class CoinController {
     lateinit var service: CoinService
 
     @GetMapping("/coin/price/current")
-    suspend fun currentPrice() : Bitcoin {
-        return service.currentPrice()
+    suspend fun currentPrice() : ResponseEntity<Bitcoin> {
+        val bitCoinPrice = service.currentPrice()
+        val response = ResponseEntity.ok(bitCoinPrice)
+        return response
     }
 
     @GetMapping("/coin/price")
@@ -28,9 +30,11 @@ class CoinController {
     }
 
     @GetMapping("/coin/find")
-    suspend fun price2(@RequestParam time: String) : BitcoinPrice {
+    suspend fun findBitcoin(@RequestParam time: String) : ResponseEntity<Bitcoin> {
         println("time $time")
-        return service.findPrice(time)
+        val coin = service.findPrice(time)
+        val res = ResponseEntity.ok(coin)
+        return res
     }
 
     @GetMapping("/coin/find/average")
