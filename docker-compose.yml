@@ -1,0 +1,20 @@
+version: '3'
+
+networks:
+  default:
+    external:
+      name: we
+
+services:
+  mongodb:
+    image: mongo:4
+    ports:
+      - "27017:27017"
+
+  web:
+    build: .
+    container_name: coinback
+    depends_on:
+      - mongodb
+    ports:
+      - "18080:8080"

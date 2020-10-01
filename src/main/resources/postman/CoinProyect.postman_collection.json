@@ -1,0 +1,142 @@
+{
+	"info": {
+		"_postman_id": "91c34346-074e-4389-9efd-44e09f0437a4",
+		"name": "CoinProyect",
+		"description": "bitcoin",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+	},
+	"item": [
+		{
+			"name": "bitcoin",
+			"request": {
+				"method": "GET",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json",
+						"type": "text"
+					}
+				],
+				"url": {
+					"raw": "https://cex.io/api/last_price/BTC/USD",
+					"protocol": "https",
+					"host": [
+						"cex",
+						"io"
+					],
+					"path": [
+						"api",
+						"last_price",
+						"BTC",
+						"USD"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "coin find all",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "http://localhost:8080/coin/find/all",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8080",
+					"path": [
+						"coin",
+						"find",
+						"all"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "coin find",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "http://localhost:8080/coin/find?time=2020-10-01T03:17:15.856217",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8080",
+					"path": [
+						"coin",
+						"find"
+					],
+					"query": [
+						{
+							"key": "time",
+							"value": "2020-10-01T03:17:15.856217"
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "coin obtain average",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "http://localhost:8080/coin/find/average?timeStart=2020-09-30T13:56:45.358&timeEnd=2020-10-01T00:18:33.243",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8080",
+					"path": [
+						"coin",
+						"find",
+						"average"
+					],
+					"query": [
+						{
+							"key": "timeStart",
+							"value": "2020-09-30T13:56:45.358"
+						},
+						{
+							"key": "timeEnd",
+							"value": "2020-10-01T00:18:33.243"
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "hi",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "http://localhost:8080/greeting?name=sebas cruz",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8080",
+					"path": [
+						"greeting"
+					],
+					"query": [
+						{
+							"key": "name",
+							"value": "sebas cruz"
+						}
+					]
+				}
+			},
+			"response": []
+		}
+	],
+	"protocolProfileBehavior": {}
+}
