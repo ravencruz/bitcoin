@@ -20,7 +20,7 @@ class ScheduleCoinTask {
 
         runBlocking {
             launch {
-                service.execute()
+                service.saveBitcoinPrice()
             }
         }
     }

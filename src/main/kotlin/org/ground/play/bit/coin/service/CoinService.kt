@@ -28,12 +28,32 @@ class CoinService {
             .baseUrl("https://cex.io")
             .build()
 
+    suspend fun saveBitcoinPrice(): Bitcoin {
+        val bitcoinResponse = getPojoFromRequest()
+        println("Bitcoin response: $bitcoinResponse")
+
+        try {
+            val savedEntity = bitcoinRepository.save(bitcoinResponse)
+            println("Bitcoin entity saved: $savedEntity")
+        } catch (e: Exception) {
+            println("Error while saving bitcoin ${e.message}")
+        }
+
+        return Bitcoin(bitcoinResponse.lprice, bitcoinResponse.curr1, bitcoinResponse.curr2)
+    }
+
     //TODO should return the DAO or a representation?
     suspend fun currentPrice(): Bitcoin {
         val bitcoinResponse = getPojoFromRequest()
-        println("Bitcoin: $bitcoinResponse")
+        println("Bitcoin request: $bitcoinResponse")
 
-        bitcoinRepository.save(bitcoinResponse)
+        try {
+            val savedEntity = bitcoinRepository.save(bitcoinResponse)
+            println("Bitcoin entity: $savedEntity")
+        } catch (e: Exception) {
+            println("Error while saving bitcoint ${e.message}")
+        }
+
         //TODO forma mas copada de hacer esto
         return Bitcoin(bitcoinResponse.lprice, bitcoinResponse.curr1, bitcoinResponse.curr2)
     }
