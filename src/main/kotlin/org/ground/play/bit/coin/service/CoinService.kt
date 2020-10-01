@@ -48,7 +48,7 @@ class CoinService {
     }
 
     suspend fun findPrice(time: String): Bitcoin {
-        val dummyBitcoin = Bitcoin("0", "0", "0")
+        val dummyBitcoin = Bitcoin("0", "0", "0", LocalDateTime.now())
         println("dummyBitcoin: $dummyBitcoin")
 
         val localDate = LocalDateTime.parse(time, DateTimeFormatter.ISO_LOCAL_DATE_TIME)
@@ -59,41 +59,21 @@ class CoinService {
             dummyBitcoin
         } else {
             val first = findByCreatedDate.get(0)
-            Bitcoin(first.lprice.toString(), first.curr1, first.curr2)
+            Bitcoin(first.lprice.toString(), first.curr1, first.curr2, first.createdDate)
         }
 
         return res
     }
 
-    //TODO should return the DAO or a representation?
-//    suspend fun currentPrice(): Bitcoin {
-//        val bitcoinResponse = getPojoFromRequest()
-//        println("Bitcoin request: $bitcoinResponse")
-//
-//        try {
-//            val savedEntity = bitcoinRepository.save(bitcoinResponse)
-//            println("Bitcoin entity: $savedEntity")
-//        } catch (e: Exception) {
-//            println("Error while saving bitcoint ${e.message}")
-//        }
-//
-//        //TODO forma mas copada de hacer esto
-//        return Bitcoin(bitcoinResponse.lprice, bitcoinResponse.curr1, bitcoinResponse.curr2)
-//    }
+    suspend fun findAll(): List<Bitcoin> {
+        val dummyBitcoin = Bitcoin("0", "0", "0", LocalDateTime.now())
+        println("dummyBitcoin: $dummyBitcoin")
 
-//    suspend fun saveAndFind(time: String): Bitcoin {
-//        val dummyBitcoin = BitcoinPrice("0", "0", "0",  LocalDateTime.now())
-//        println("Bitcoin: $dummyBitcoin")
-//
-//        val bitcoinResponse = getPojoFromRequest()
-//        println("Bitcoin to save: $bitcoinResponse")
-//        bitcoinRepository.save(bitcoinResponse)
-//
-//        val findByCreatedDate = bitcoinRepository.findByCreatedDate(bitcoinResponse.createdDate)
-//        println("found: $findByCreatedDate")
-//
-//        return Bitcoin(dummyBitcoin.lprice, dummyBitcoin.curr1, dummyBitcoin.curr2)
-//    }
+        val allCoins = bitcoinRepository.findAll(Sort.by(Sort.Direction.DESC, "lprice"))
+        val allCoinsDTO = allCoins.map { Bitcoin(it.lprice.toString(), it.curr1, it.curr2, it.createdDate) }
+
+        return allCoinsDTO
+    }
 
     suspend fun findAveragePrice(startTime: String, endTime: String): BitcoinInformation {
         val dummyBitcoin = BitcoinInformation(0.0, 0.0)
@@ -138,4 +118,6 @@ class CoinService {
         val response = getMethod.awaitExchange().awaitBody<String>()
         return response
     }
+
+
 }

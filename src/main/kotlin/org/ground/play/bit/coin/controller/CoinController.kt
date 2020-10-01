@@ -33,18 +33,13 @@ class CoinController {
         return res
     }
 
-//    @GetMapping("/coin/price/current")
-//    suspend fun currentPrice() : ResponseEntity<Bitcoin> {
-//        val bitCoinPrice = service.currentPrice()
-//        val response = ResponseEntity.ok(bitCoinPrice)
-//        return response
-//    }
-
-//    @GetMapping("/coin/price")
-//    suspend fun saveSearch(@RequestParam time: String) : Bitcoin {
-//        println("time $time")
-//        return service.saveAndFind(time)
-//    }
+    @GetMapping("/coin/find/all")
+    suspend fun findAllBitcoins() : ResponseEntity<List<Bitcoin>> {
+        println("findAllBitcoins")
+        val coins = service.findAll()
+        val res = ResponseEntity.ok(coins)
+        return res
+    }
 
 
 }
