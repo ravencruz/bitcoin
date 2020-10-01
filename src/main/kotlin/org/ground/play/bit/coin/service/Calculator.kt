@@ -12,12 +12,11 @@ class Calculator {
         println("found range me: $rangeCoins")
         println("found range me: ${rangeCoins.size}")
         println("size coinds ${allCoins.size}")
-        println(" first coin ${allCoins[0]}")
 
         val res = BitcoinInformation(0.0, 0.0)
 
-        val averagePrice = rangeCoins.map { it.lprice }.average()
-        val maxPrice = allCoins[0].lprice
+        val averagePrice = if (rangeCoins.isNotEmpty()) rangeCoins.map { it.lprice }.average() else 1.0
+        val maxPrice = allCoins.maxBy { it.lprice }?.lprice ?: 1.0
 
         val diffPorcentual = Math.abs(maxPrice - averagePrice) / Math.abs(averagePrice) * 100
 
