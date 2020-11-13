@@ -11,5 +11,5 @@ import org.springframework.web.reactive.config.EnableWebFlux
 class CoinApplication
 
 fun main(args: Array<String>) {
-	runApplication<CoinApplication>(*args)
+    runApplication<CoinApplication>(*args)
 }

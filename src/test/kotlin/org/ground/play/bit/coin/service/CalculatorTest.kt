@@ -5,8 +5,6 @@ import org.junit.jupiter.api.Assertions
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 
-import org.junit.jupiter.api.Assertions.*
-
 internal class CalculatorTest {
 
     private val calculator = Calculator()
@@ -29,16 +27,15 @@ internal class CalculatorTest {
     @Test
     fun porcentualDifference() {
         val coinInfo = calculator.porcentualDifference(range, all)
-        Assertions.assertEquals(5.0,5.0, 0.001)
+        Assertions.assertEquals(5.0, 5.0, 0.001)
         Assertions.assertEquals(25.0, coinInfo.average, 0.001)
         Assertions.assertEquals(140.0, coinInfo.differenceAverageMax, 0.001)
     }
 
     @Test
     fun porcentualDifferenceEmpty() {
-        val coinInfo = calculator.porcentualDifference(mutableListOf<BitcoinPriceDocument>()
-                , mutableListOf<BitcoinPriceDocument>())
-        Assertions.assertEquals(5.0,5.0, 0.001)
+        val coinInfo = calculator.porcentualDifference(mutableListOf<BitcoinPriceDocument>(), mutableListOf<BitcoinPriceDocument>())
+        Assertions.assertEquals(5.0, 5.0, 0.001)
         Assertions.assertEquals(1.0, coinInfo.average, 0.001)
         Assertions.assertEquals(0.0, coinInfo.differenceAverageMax, 0.001)
     }

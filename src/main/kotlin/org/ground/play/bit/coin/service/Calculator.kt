@@ -6,8 +6,10 @@ import org.springframework.stereotype.Service
 
 @Service
 class Calculator {
-    fun porcentualDifference(rangeCoins: List<BitcoinPriceDocument>,
-                             allCoins: List<BitcoinPriceDocument>): BitcoinInformation {
+    fun porcentualDifference(
+        rangeCoins: List<BitcoinPriceDocument>,
+        allCoins: List<BitcoinPriceDocument>
+    ): BitcoinInformation {
 
         println("found range me: $rangeCoins")
         println("found range me: ${rangeCoins.size}")
