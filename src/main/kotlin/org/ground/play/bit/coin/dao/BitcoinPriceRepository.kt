@@ -12,14 +12,14 @@ interface BitcoinPriceRepository : MongoRepository<BitcoinPriceDocument, String>
 
     fun findByCreatedDate(@Param("createdDate") time: LocalDateTime): List<BitcoinPriceDocument>
 
-
-    fun findByCreatedDateBetween(@Param("createdDateStart") start: LocalDateTime
-                                 , @Param("createdDateEnd") end: LocalDateTime): List<BitcoinPriceDocument>
-
+    fun findByCreatedDateBetween(
+        @Param("createdDateStart") start: LocalDateTime,
+        @Param("createdDateEnd") end: LocalDateTime
+    ): List<BitcoinPriceDocument>
 
     @Query("{'createdDate': {\$gte: ?0, \$lte:?1 }}")
-    fun findBitcoinBetweenIncluded(@Param("createdDateStart") start: LocalDateTime
-                                   , @Param("createdDateEnd") end: LocalDateTime): List<BitcoinPriceDocument>
-
-
+    fun findBitcoinBetweenIncluded(
+        @Param("createdDateStart") start: LocalDateTime,
+        @Param("createdDateEnd") end: LocalDateTime
+    ): List<BitcoinPriceDocument>
 }

@@ -16,7 +16,6 @@ import org.springframework.web.reactive.function.client.awaitExchange
 import java.time.LocalDateTime
 import java.time.format.DateTimeFormatter
 
-
 @Service
 class CoinService {
 
@@ -29,18 +28,20 @@ class CoinService {
     val mapper = jacksonObjectMapper()
 
     val webClient = WebClient
-            .builder()
-            .baseUrl("https://cex.io")
-            .build()
+        .builder()
+        .baseUrl("https://cex.io")
+        .build()
 
     suspend fun saveBitcoinPrice(): Bitcoin {
         val bitcoinResponse = getPojoFromRequest()
         println("Bitcoin response: $bitcoinResponse")
 
         try {
-            val bitcoinPrice = BitcoinPriceDocument(bitcoinResponse.lprice.toDouble(),
-                    bitcoinResponse.curr1,
-                    bitcoinResponse.curr2)
+            val bitcoinPrice = BitcoinPriceDocument(
+                bitcoinResponse.lprice.toDouble(),
+                bitcoinResponse.curr1,
+                bitcoinResponse.curr2
+            )
             val savedEntity = bitcoinRepository.save(bitcoinPrice)
             println("Bitcoin entity saved: $savedEntity")
         } catch (e: Exception) {
@@ -106,6 +107,4 @@ class CoinService {
         val response = getMethod.awaitExchange().awaitBody<String>()
         return response
     }
-
-
 }
