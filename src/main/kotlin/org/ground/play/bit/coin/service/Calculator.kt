@@ -5,6 +5,7 @@ import org.ground.play.bit.coin.model.BitcoinPriceDocument
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 import org.springframework.stereotype.Service
+import kotlin.math.abs
 
 @Service
 class Calculator {
@@ -23,9 +24,9 @@ class Calculator {
         val res = BitcoinInformation(0.0, 0.0)
 
         val averagePrice = if (rangeCoins.isNotEmpty()) rangeCoins.map { it.lprice }.average() else 1.0
-        val maxPrice = allCoins.maxBy { it.lprice }?.lprice ?: 1.0
+        val maxPrice = allCoins.maxByOrNull { it.lprice }?.lprice ?: 1.0
 
-        val diffPorcentual = Math.abs(maxPrice - averagePrice) / Math.abs(averagePrice) * 100
+        val diffPorcentual = abs(maxPrice - averagePrice) / abs(averagePrice) * 100
 
         res.average = averagePrice
         res.differenceAverageMax = diffPorcentual
