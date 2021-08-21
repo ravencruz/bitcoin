@@ -8,7 +8,6 @@ import org.ground.play.bit.coin.dto.BitcoinInformation
 import org.ground.play.bit.coin.model.BitcoinPriceDocument
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
-import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.data.domain.Sort
 import org.springframework.http.HttpMethod
 import org.springframework.stereotype.Service
@@ -69,23 +68,15 @@ class CoinService(
         return res
     }
 
-    suspend fun findAll(): List<Bitcoin> {
-        val dummyBitcoin = Bitcoin("0", "0", "0")
-        logger.info("dummyBitcoin: $dummyBitcoin")
+    suspend fun findAll() =
+        bitcoinRepository
+            .findAll(Sort.by(Sort.Direction.DESC, "lprice"))
+            .map { it.toBitcoin() }
 
-        val allCoins = bitcoinRepository.findAll(Sort.by(Sort.Direction.DESC, "lprice"))
-        val allCoinsDTO = allCoins.map { Bitcoin(it.lprice.toString(), it.curr1, it.curr2, it.createdDate) }
-
-        return allCoinsDTO
-    }
 
     suspend fun findAveragePrice(startTime: String, endTime: String): BitcoinInformation {
         val localStartDate = LocalDateTime.parse(startTime, DateTimeFormatter.ISO_LOCAL_DATE_TIME)
         val localEndDate = LocalDateTime.parse(endTime, DateTimeFormatter.ISO_LOCAL_DATE_TIME)
-
-//        val findByCreatedDate = bitcoinRepository.findByCreatedDateBetween(localStartDate, localEndDate)
-//        println("found range template: $findByCreatedDate")
-//        println("found range template: ${findByCreatedDate.size}")
 
         val bitcoinInRange = bitcoinRepository.findBitcoinBetweenIncluded(localStartDate, localEndDate)
         val allCoins = bitcoinRepository.findAll(Sort.by(Sort.Direction.DESC, "lprice"))
@@ -107,4 +98,12 @@ class CoinService(
         val response = getMethod.awaitExchange().awaitBody<String>()
         return response
     }
+
+    fun BitcoinPriceDocument.toBitcoin() =
+        Bitcoin(
+            this.lprice.toString(),
+            this.curr1,
+            this.curr2,
+            this.createdDate,
+        )
 }
