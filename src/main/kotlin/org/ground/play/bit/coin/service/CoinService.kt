@@ -6,6 +6,8 @@ import org.ground.play.bit.coin.dao.BitcoinPriceRepository
 import org.ground.play.bit.coin.dto.Bitcoin
 import org.ground.play.bit.coin.dto.BitcoinInformation
 import org.ground.play.bit.coin.model.BitcoinPriceDocument
+import org.slf4j.Logger
+import org.slf4j.LoggerFactory
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.data.domain.Sort
 import org.springframework.http.HttpMethod
@@ -18,6 +20,8 @@ import java.time.format.DateTimeFormatter
 
 @Service
 class CoinService {
+
+    val logger: Logger = LoggerFactory.getLogger(this.javaClass.name)
 
     @Autowired
     lateinit var bitcoinRepository: BitcoinPriceRepository
@@ -34,7 +38,7 @@ class CoinService {
 
     suspend fun saveBitcoinPrice(): Bitcoin {
         val bitcoinResponse = getPojoFromRequest()
-        println("Bitcoin response: $bitcoinResponse")
+        logger.info("Bitcoin response: $bitcoinResponse")
 
         try {
             val bitcoinPrice = BitcoinPriceDocument(
@@ -43,9 +47,9 @@ class CoinService {
                 bitcoinResponse.curr2
             )
             val savedEntity = bitcoinRepository.save(bitcoinPrice)
-            println("Bitcoin entity saved: $savedEntity")
+            logger.info("Bitcoin entity saved: $savedEntity")
         } catch (e: Exception) {
-            println("Error while saving bitcoin ${e.message}")
+            logger.error("Error while saving bitcoin ${e.message}")
         }
 
         return bitcoinResponse
@@ -53,11 +57,11 @@ class CoinService {
 
     suspend fun findPrice(time: String): Bitcoin {
         val dummyBitcoin = Bitcoin("0", "0", "0")
-        println("dummyBitcoin: $dummyBitcoin")
+        logger.info("dummyBitcoin: $dummyBitcoin")
 
         val localDate = LocalDateTime.parse(time, DateTimeFormatter.ISO_LOCAL_DATE_TIME)
         val findByCreatedDate = bitcoinRepository.findByCreatedDate(localDate)
-        println("found: $findByCreatedDate")
+        logger.info("found: $findByCreatedDate")
 
         val res = if (findByCreatedDate.isEmpty()) {
             dummyBitcoin
@@ -71,7 +75,7 @@ class CoinService {
 
     suspend fun findAll(): List<Bitcoin> {
         val dummyBitcoin = Bitcoin("0", "0", "0")
-        println("dummyBitcoin: $dummyBitcoin")
+        logger.info("dummyBitcoin: $dummyBitcoin")
 
         val allCoins = bitcoinRepository.findAll(Sort.by(Sort.Direction.DESC, "lprice"))
         val allCoinsDTO = allCoins.map { Bitcoin(it.lprice.toString(), it.curr1, it.curr2, it.createdDate) }
@@ -90,14 +94,14 @@ class CoinService {
         val bitcoinInRange = bitcoinRepository.findBitcoinBetweenIncluded(localStartDate, localEndDate)
         val allCoins = bitcoinRepository.findAll(Sort.by(Sort.Direction.DESC, "lprice"))
         val dataBitcoin = calculator.porcentualDifference(bitcoinInRange, allCoins)
-        println("Bitcoin Information: $dataBitcoin")
+        logger.info("Bitcoin Information: $dataBitcoin")
 
         return dataBitcoin
     }
 
     private suspend fun getPojoFromRequest(): Bitcoin {
         val bitcoinApiResponse = callApi()
-        println("api response: $bitcoinApiResponse")
+        logger.info("api response: $bitcoinApiResponse")
         val bitcoinResponse: Bitcoin = mapper.readValue(bitcoinApiResponse)
         return bitcoinResponse
     }

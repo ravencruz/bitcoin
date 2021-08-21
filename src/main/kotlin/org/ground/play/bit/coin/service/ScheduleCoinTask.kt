@@ -2,6 +2,8 @@ package org.ground.play.bit.coin.service
 
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
+import org.slf4j.Logger
+import org.slf4j.LoggerFactory
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.scheduling.annotation.Scheduled
 import org.springframework.stereotype.Component
@@ -14,16 +16,18 @@ class ScheduleCoinTask {
     @Autowired
     lateinit var service: CoinService
 
-    @Scheduled(fixedRate = 10_000) // , initialDelay = 30_000
+    val logger: Logger = LoggerFactory.getLogger(this.javaClass.name)
+
+    @Scheduled(fixedRate = 30_000) // , initialDelay = 30_000
     fun reportTime() {
-        println("The time is now ${DateTimeFormatter.ISO_LOCAL_TIME.format(LocalDateTime.now())}")
+        logger.info("The time is now ${DateTimeFormatter.ISO_LOCAL_TIME.format(LocalDateTime.now())}")
 
         runBlocking {
             launch {
                 try {
                     service.saveBitcoinPrice()
                 } catch (e: Exception) {
-                    println("Error al guardar ${e.message}")
+                    logger.error("Error al guardar ${e.message}")
                 }
             }
         }
