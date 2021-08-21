@@ -19,16 +19,12 @@ import java.time.LocalDateTime
 import java.time.format.DateTimeFormatter
 
 @Service
-class CoinService {
+class CoinService(
+    val calculator: Calculator,
+    val bitcoinRepository: BitcoinPriceRepository
+) {
 
     val logger: Logger = LoggerFactory.getLogger(this.javaClass.name)
-
-    @Autowired
-    lateinit var bitcoinRepository: BitcoinPriceRepository
-
-    @Autowired
-    lateinit var calculator: Calculator
-
     val mapper = jacksonObjectMapper()
 
     val webClient = WebClient
