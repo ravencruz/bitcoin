@@ -2,18 +2,23 @@ package org.ground.play.bit.coin.service
 
 import org.ground.play.bit.coin.dto.BitcoinInformation
 import org.ground.play.bit.coin.model.BitcoinPriceDocument
+import org.slf4j.Logger
+import org.slf4j.LoggerFactory
 import org.springframework.stereotype.Service
 
 @Service
 class Calculator {
+
+    val logger: Logger = LoggerFactory.getLogger(this.javaClass.name)
+
     fun porcentualDifference(
         rangeCoins: List<BitcoinPriceDocument>,
         allCoins: List<BitcoinPriceDocument>
     ): BitcoinInformation {
 
-        println("found range me: $rangeCoins")
-        println("found range me: ${rangeCoins.size}")
-        println("size coinds ${allCoins.size}")
+        logger.info("found range me: $rangeCoins")
+        logger.info("found range me: ${rangeCoins.size}")
+        logger.info("size coinds ${allCoins.size}")
 
         val res = BitcoinInformation(0.0, 0.0)
 
