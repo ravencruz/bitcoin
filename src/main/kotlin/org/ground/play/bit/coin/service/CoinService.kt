@@ -51,21 +51,15 @@ class CoinService(
     }
 
     suspend fun findPrice(time: String): Bitcoin {
-        val dummyBitcoin = Bitcoin("0", "0", "0")
-        logger.info("dummyBitcoin: $dummyBitcoin")
-
         val localDate = LocalDateTime.parse(time, DateTimeFormatter.ISO_LOCAL_DATE_TIME)
-        val findByCreatedDate = bitcoinRepository.findByCreatedDate(localDate)
-        logger.info("found: $findByCreatedDate")
 
-        val res = if (findByCreatedDate.isEmpty()) {
-            dummyBitcoin
-        } else {
-            val first = findByCreatedDate.get(0)
-            Bitcoin(first.lprice.toString(), first.curr1, first.curr2, first.createdDate)
-        }
+        val findByCreatedDate = bitcoinRepository
+            .findByCreatedDate(localDate)
+            .also {
+                logger.info("found: $it")
+            }
 
-        return res
+        return findByCreatedDate.getOrNull(0)?.toBitcoin() ?: Bitcoin("0", "0", "0")
     }
 
     suspend fun findAll() =
