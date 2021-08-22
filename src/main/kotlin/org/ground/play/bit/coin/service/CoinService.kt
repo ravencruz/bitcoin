@@ -8,7 +8,6 @@ import org.ground.play.bit.coin.dto.BitcoinInformation
 import org.ground.play.bit.coin.model.BitcoinPriceDocument
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
-import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.data.domain.Sort
 import org.springframework.http.HttpMethod
 import org.springframework.stereotype.Service
@@ -23,7 +22,6 @@ class CoinService(
     val calculator: Calculator,
     val bitcoinRepository: BitcoinPriceRepository
 ) {
-
     val logger: Logger = LoggerFactory.getLogger(this.javaClass.name)
     val mapper = jacksonObjectMapper()
 
@@ -37,13 +35,10 @@ class CoinService(
         logger.info("Bitcoin response: $bitcoinResponse")
 
         try {
-            val bitcoinPrice = BitcoinPriceDocument(
-                bitcoinResponse.lprice.toDouble(),
-                bitcoinResponse.curr1,
-                bitcoinResponse.curr2
-            )
-            val savedEntity = bitcoinRepository.save(bitcoinPrice)
-            logger.info("Bitcoin entity saved: $savedEntity")
+            bitcoinRepository.save(bitcoinResponse.toBitcoinDocument())
+                .also {
+                    logger.info("Bitcoin entity saved: $it")
+                }
         } catch (e: Exception) {
             logger.error("Error while saving bitcoin ${e.message}")
         }
@@ -52,40 +47,26 @@ class CoinService(
     }
 
     suspend fun findPrice(time: String): Bitcoin {
-        val dummyBitcoin = Bitcoin("0", "0", "0")
-        logger.info("dummyBitcoin: $dummyBitcoin")
-
         val localDate = LocalDateTime.parse(time, DateTimeFormatter.ISO_LOCAL_DATE_TIME)
-        val findByCreatedDate = bitcoinRepository.findByCreatedDate(localDate)
-        logger.info("found: $findByCreatedDate")
 
-        val res = if (findByCreatedDate.isEmpty()) {
-            dummyBitcoin
-        } else {
-            val first = findByCreatedDate.get(0)
-            Bitcoin(first.lprice.toString(), first.curr1, first.curr2, first.createdDate)
-        }
+        val findByCreatedDate = bitcoinRepository
+            .findByCreatedDate(localDate)
+            .also {
+                logger.info("found: $it")
+            }
 
-        return res
+        return findByCreatedDate.getOrNull(0)?.toBitcoin() ?: Bitcoin("0", "0", "0")
     }
 
-    suspend fun findAll(): List<Bitcoin> {
-        val dummyBitcoin = Bitcoin("0", "0", "0")
-        logger.info("dummyBitcoin: $dummyBitcoin")
+    suspend fun findAll() =
+        bitcoinRepository
+            .findAll(Sort.by(Sort.Direction.DESC, "lprice"))
+            .map { it.toBitcoin() }
 
-        val allCoins = bitcoinRepository.findAll(Sort.by(Sort.Direction.DESC, "lprice"))
-        val allCoinsDTO = allCoins.map { Bitcoin(it.lprice.toString(), it.curr1, it.curr2, it.createdDate) }
-
-        return allCoinsDTO
-    }
 
     suspend fun findAveragePrice(startTime: String, endTime: String): BitcoinInformation {
         val localStartDate = LocalDateTime.parse(startTime, DateTimeFormatter.ISO_LOCAL_DATE_TIME)
         val localEndDate = LocalDateTime.parse(endTime, DateTimeFormatter.ISO_LOCAL_DATE_TIME)
-
-//        val findByCreatedDate = bitcoinRepository.findByCreatedDateBetween(localStartDate, localEndDate)
-//        println("found range template: $findByCreatedDate")
-//        println("found range template: ${findByCreatedDate.size}")
 
         val bitcoinInRange = bitcoinRepository.findBitcoinBetweenIncluded(localStartDate, localEndDate)
         val allCoins = bitcoinRepository.findAll(Sort.by(Sort.Direction.DESC, "lprice"))
@@ -107,4 +88,19 @@ class CoinService(
         val response = getMethod.awaitExchange().awaitBody<String>()
         return response
     }
+
+    fun BitcoinPriceDocument.toBitcoin() =
+        Bitcoin(
+            this.lprice.toString(),
+            this.curr1,
+            this.curr2,
+            this.createdDate,
+        )
+
+    fun Bitcoin.toBitcoinDocument() =
+        BitcoinPriceDocument(
+            this.lprice.toDouble(),
+            this.curr1,
+            this.curr2
+        )
 }

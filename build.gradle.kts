@@ -3,10 +3,12 @@ import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 plugins {
 	id("org.springframework.boot") version "2.3.4.RELEASE"
 	id("io.spring.dependency-management") version "1.0.10.RELEASE"
-	id( "org.jmailen.kotlinter") version "3.2.0"
-	kotlin("jvm") version "1.3.72"
-	kotlin("plugin.spring") version "1.3.72"
-	kotlin("plugin.jpa") version "1.3.72"
+//	id( "org.jmailen.kotlinter") version "3.2.0"
+
+	val kotlin_version = "1.5.21"
+	kotlin("jvm") version kotlin_version
+	kotlin("plugin.spring") version kotlin_version
+	kotlin("plugin.jpa") version kotlin_version
 }
 
 group = "org.ground.play.bit"
