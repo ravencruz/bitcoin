@@ -22,7 +22,6 @@ class CoinService(
     val calculator: Calculator,
     val bitcoinRepository: BitcoinPriceRepository
 ) {
-
     val logger: Logger = LoggerFactory.getLogger(this.javaClass.name)
     val mapper = jacksonObjectMapper()
 
@@ -36,13 +35,10 @@ class CoinService(
         logger.info("Bitcoin response: $bitcoinResponse")
 
         try {
-            val bitcoinPrice = BitcoinPriceDocument(
-                bitcoinResponse.lprice.toDouble(),
-                bitcoinResponse.curr1,
-                bitcoinResponse.curr2
-            )
-            val savedEntity = bitcoinRepository.save(bitcoinPrice)
-            logger.info("Bitcoin entity saved: $savedEntity")
+            bitcoinRepository.save(bitcoinResponse.toBitcoinDocument())
+                .also {
+                    logger.info("Bitcoin entity saved: $it")
+                }
         } catch (e: Exception) {
             logger.error("Error while saving bitcoin ${e.message}")
         }
@@ -99,5 +95,12 @@ class CoinService(
             this.curr1,
             this.curr2,
             this.createdDate,
+        )
+
+    fun Bitcoin.toBitcoinDocument() =
+        BitcoinPriceDocument(
+            this.lprice.toDouble(),
+            this.curr1,
+            this.curr2
         )
 }
